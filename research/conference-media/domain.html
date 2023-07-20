@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>AIIDE 23: MultiStyle Custom Domain</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+  </head>
+  <body>
+
+    The domain is composed of a collection of objects of type Player, Location, Mineable, Choppable, Gatherable, Puzzle, Equippable, and one generic Object.
+
+    <table>
+        <caption>Objects in the domain.</caption>
+        <tr>
+            <th><strong>Object</strong></th>
+            <th><strong>Type</strong></th>
+        </tr>
+        <tr>
+            <td>Red</td>
+            <td>Player</td>
+        </tr>
+        <tr>
+            <td>Blue</td>
+            <td>Player</td>
+        </tr>
+        <tr>
+            <td>Green</td>
+            <td>Player</td>
+        </tr>
+        <tr>
+            <td>Act1</td>
+            <td>Location</td>
+        </tr>
+        <tr>
+            <td>Act2</td>
+            <td>Location</td>
+        </tr>
+        <tr>
+            <td>Act3</td>
+            <td>Location</td>
+        </tr>
+        <tr>
+            <td>ComingHome</td>
+            <td>Location</td>
+        </tr>
+        <tr>
+            <td>Stone</td>
+            <td>Mineable</td>
+        </tr>
+        <tr>
+            <td>Iron</td>
+            <td>Mineable</td>
+        </tr>
+        <tr>
+            <td>Coal</td>
+            <td>Mineable</td>
+        </tr>
+        <tr>
+            <td>Wood</td>
+            <td>Choppable</td>
+        </tr>
+        <tr>
+            <td>ChameleonHerb</td>
+            <td>Gatherable</td>
+        </tr>
+        <tr>
+            <td>SleepHerb</td>
+            <td>Gatherable</td>
+        </tr>
+        <tr>
+            <td>GoldCoin</td>
+            <td>Gatherable</td>
+        </tr>
+        <tr>
+            <td>FireSprite</td>
+            <td>Gatherable</td>
+        </tr>
+        <tr>
+            <td>Flint</td>
+            <td>Gatherable</td>
+        </tr>
+        <tr>
+            <td>Vine</td>
+            <td>Gatherable</td>
+        </tr>
+        <tr>
+            <td>Sticks</td>
+            <td>Gatherable</td>
+        </tr>
+        <tr>
+            <td>RockPuzzle</td>
+            <td>Puzzle</td>
+        </tr>
+        <tr>
+            <td>MonolithPuzzle</td>
+            <td>Puzzle</td>
+        </tr>
+        <tr>
+            <td>DisableButton</td>
+            <td>Object</td>
+        </tr>
+        <tr>
+            <td>Sword</td>
+            <td>Equippable</td>
+        </tr>
+        <tr>
+            <td>ChameleonSalve</td>
+            <td>Equippable</td>
+        </tr>
+        <tr>
+            <td>MortarAndPestle</td>
+            <td>Equippable</td>
+        </tr>
+        <tr>
+            <td>Torch</td>
+            <td>Equippable</td>
+        </tr>
+        <tr>
+            <td>FireSuit</td>
+            <td>Equippable</td>
+        </tr>
+        <tr>
+            <td>SleepBomb</td>
+            <td>Equippable</td>
+        </tr>
+        <tr>
+            <td>DemoBomb</td>
+            <td>Equippable</td>
+        </tr>
+    </table>
+    
+    Through propositions, the initial state positions all objects where they're supposed to be and gives them the correct state. Note that this is a <i>minimal</i> initial state, in that all literals not listed here are false. The other literals in the domain can be inferred by the effects of actions.
+    
+    <table>
+        <caption>The minimal initial state of the domain.</caption>
+        <tr>
+            <th><strong>Proposition</strong></th>
+        </tr>
+        <tr>
+            <td>(at Red Act1)</td>
+        </tr>
+        <tr>
+            <td>(at Blue Act1)</td>
+        </tr>
+        <tr>
+            <td>(at Green Act1)</td>
+        </tr>
+        <tr>
+            <td>(connected Act1 Act2)</td>
+        </tr>
+        <tr>
+            <td>(connected Act2 Act3)</td>
+        </tr>
+        <tr>
+            <td>(connected Act3 ComingHome)</td>
+        </tr>
+        <tr>
+            <td>(at Stone Act1)</td>
+        </tr>
+        <tr>
+            <td>(at Iron Act1)</td>
+        </tr>
+        <tr>
+            <td>(at RockPuzzle Act1)</td>
+        </tr>
+        <tr>
+            <td>(reward-for RockPuzzle ChameleonHerb)</td>
+        </tr>
+        <tr>
+            <td>(at Wood Act1)</td>
+        </tr>
+        <tr>
+            <td>(at Flint Act2)</td>
+        </tr>
+        <tr>
+            <td>(at Vine Act2)</td>
+        </tr>
+        <tr>
+            <td>(at Wood Act2)</td>
+        </tr>
+        <tr>
+            <td>(at Sticks Act3)</td>
+        </tr>
+        <tr>
+            <td>(at Coal Act3)</td>
+        </tr>
+        <tr>
+            <td>(at SleepHerb Act3)</td>
+        </tr>
+        <tr>
+            <td>(at Stone Act3)</td>
+        </tr>
+        <tr>
+            <td>(defended Monolith)</td>
+        </tr>
+        <tr>
+            <td>(at MonolithPuzzle Act3)</td>
+        </tr>
+        <tr>
+            <td>(reward-for MonolithPuzzle DisableButton)</td>
+        </tr>
+    </table>
+    
+    The goal state for the domain is simple: the three players need to be at the ComingHome location, which they can only get to by disabling or destroying the monolith.
+    
+    <table>
+        <caption>The goal state for the domain.</caption>
+        <tr>
+            <th><strong>Proposition</strong></th>
+        </tr>
+        <tr>
+            <td>(at Red ComingHome)</td>
+        </tr>
+        <tr>
+            <td>(at Blue ComingHome)</td>
+        </tr>
+        <tr>
+            <td>(at Green ComingHome)</td>
+        </tr>
+    </table>
+    
+    I separated actions into rough categories to make it easier to browse. These categories do not exist in the planning process.
+    <br />
+    First, we have 9 crafting actions. Because crafting has specific output based on the materials used, every crafting action has to be defined separately; there is no "general" crafting action. Nonetheless, all of these actions are similar: they take various materials and "produce" something else.
+    
+    <table>
+        <caption>Crafting actions in the domain.</caption>
+        <tr>
+            <th><strong>Action</strong></th>
+            <th><strong>Arguments</strong></th>
+            <th><strong>Preconditions</strong></th>
+            <th><strong>Effects</strong></th>
+        </tr>
+        <tr>
+            <td>craft-mortar-and-pestle</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act1)<br />(available Stone Act1)</td>
+            <td>(has MortarAndPestle ?p)</td>
+        </tr>
+    </table>
+
+  </body>
+</html>
