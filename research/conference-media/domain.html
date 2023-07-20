@@ -7,9 +7,10 @@
     <script src="script.js"></script>
   </head>
   <body>
-
+    <h1>Example Domain for MultiStyle: AIIDE 2023</h1>
     The domain is composed of a collection of objects of type Player, Location, Mineable, Choppable, Gatherable, Puzzle, Equippable, and one generic Object.
-
+    <br />
+    <br />
     <table>
         <caption>Objects in the domain.</caption>
         <tr>
@@ -129,9 +130,10 @@
             <td>Equippable</td>
         </tr>
     </table>
-    
+    <br />
     Through propositions, the initial state positions all objects where they're supposed to be and gives them the correct state. Note that this is a <i>minimal</i> initial state, in that all literals not listed here are false. The other literals in the domain can be inferred by the effects of actions.
-    
+    <br />
+    <br />
     <table>
         <caption>The minimal initial state of the domain.</caption>
         <tr>
@@ -201,9 +203,10 @@
             <td>(reward-for MonolithPuzzle DisableButton)</td>
         </tr>
     </table>
-    
+    <br />
     The goal state for the domain is simple: the three players need to be at the ComingHome location, which they can only get to by disabling or destroying the monolith.
-    
+    <br />
+    <br />
     <table>
         <caption>The goal state for the domain.</caption>
         <tr>
@@ -219,11 +222,13 @@
             <td>(at Green ComingHome)</td>
         </tr>
     </table>
-    
-    I separated actions into rough categories to make it easier to browse. These categories do not exist in the planning process.
+    <br />
+    We separated actions into rough categories to make it easier to browse. These categories do not exist in the planning process.
+    <br />
     <br />
     First, we have 9 crafting actions. Because crafting has specific output based on the materials used, every crafting action has to be defined separately; there is no "general" crafting action. Nonetheless, all of these actions are similar: they take various materials and "produce" something else.
-    
+    <br />
+    <br />
     <table>
         <caption>Crafting actions in the domain.</caption>
         <tr>
@@ -238,7 +243,219 @@
             <td>(at ?p Act1)<br />(available Stone Act1)</td>
             <td>(has MortarAndPestle ?p)</td>
         </tr>
+        <tr>
+            <td>craft-chameleon-salve</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act1)<br />(available ChameleonHerb Act1)<br />(has MortarAndPestle ?p)</td>
+            <td>(available ChameleonSalve Act1)</td>
+        </tr>
+        <tr>
+            <td>craft-sword</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act1)<br />(available Iron Act1)<br />(available Wood Act1)</td>
+            <td>(available Sword Act1)</td>
+        </tr>
+        <tr>
+            <td>craft-torch</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act2)<br />(available Flint Act2)<br />(available Wood Act2)</td>
+            <td>(available Torch Act2)</td>
+        </tr>
+        <tr>
+            <td>craft-rope</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act2)<br />(available Vine Act2)</td>
+            <td>(available Rope Act2)</td>
+        </tr>
+        <tr>
+            <td>craft-house</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act2)<br />(available Wood Act2)<br />(available Rope Act2)</td>
+            <td>(at House Act2)</td>
+        </tr>
+        <tr>
+            <td>craft-firesuit</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(available Sticks Act3)<br />(available Coal Act3)</td>
+            <td>(available FireSuit Act3)</td>
+        </tr>
+        <tr>
+            <td>craft-sleepbomb</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(available FireSprite Act3)<br />(available SleepHerb Act3)</td>
+            <td>(available SleepBomb Act3)</td>
+        </tr>
+        <tr>
+            <td>craft-demobomb</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(available FireSprite Act3)<br />(available Stone Act3)</td>
+            <td>(available DemoBomb Act3)</td>
+        </tr>
     </table>
-
+    <br />
+    Next, we have four movement-related actions. Each action is designed to move the entire team as a unit; this way, the solution plan is more readable since it contains a quarter as many move actions. First, we have a generic "proceed" action which is used to move from place to place once all players are ready to move. The other three actions are the act-specific actions which cause the players to be ready to move. They are separate actions because they have their own distinct preconditions; for example, in Act 1 the boat simply needs to not be defended for the group to proceed to Act 2, but in Act 3 the Monolith must be deactivated or destroyed before the group can proceed to ComingHome.
+    <br />
+    <br />
+    <table>
+        <caption>Movement-related actions in the domain.</caption>
+        <tr>
+            <th><strong>Action</strong></th>
+            <th><strong>Arguments</strong></th>
+            <th><strong>Preconditions</strong></th>
+            <th><strong>Effects</strong></th>
+        </tr>
+        <tr>
+            <td>proceed</td>
+            <td>?l1 - Location<br />?l2 - Location</td>
+            <td>(connected ?l1 ?l2)<br />(at Red ?l1)<br />(at Blue ?l1)<br />(at Green ?l1)<br />(readyto ?l2)</td>
+            <td>(at Red ?l2)<br />(at Green ?l2)<br />(at Blue ?l2)<br />(not (at Red ?l1)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(at Green ?l1)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(at Blue ?l1)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(readyto ?l2))</td>
+        </tr>
+        <tr>
+            <td>captain-boat</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act1)<br />(not (defended Boat))</td>
+            <td>(readyto Act2)</td>
+        </tr>
+        <tr>
+            <td>disembark</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act2)<br />(known Act3)</td>
+            <td>(readyto Act3)</td>
+        </tr>
+        <tr>
+            <td>exit</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(not (active Monolith))</td>
+            <td>(readyto ComingHome)</td>
+        </tr>
+    </table>
+    <br />
+    We classify the next group of actions as "inhabitant-related" as they relate to at least the rough concept of NPCs who inhabit the domain (though the NPCs aren't actually characters in the planning process). This category is rather arbitrary and simply gives us a way to not have our "all remaining actions" table be massive.
+    <br />
+    <br />
+    <table>
+        <caption>Inhabitant-related actions in the domain.</caption>
+        <tr>
+            <th><strong>Action</strong></th>
+            <th><strong>Arguments</strong></th>
+            <th><strong>Preconditions</strong></th>
+            <th><strong>Effects</strong></th>
+        </tr>
+        <tr>
+            <td>attack-camp</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act1)<br />(equipped ?p Sword)</td>
+            <td>(not (defended Boat))</td>
+        </tr>
+        <tr>
+            <td>sneak-by-camp</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act1)<br />(equipped ?p ChameleonSalve)</td>
+            <td>(not (defended Boat))</td>
+        </tr>
+        <tr>
+            <td>fight-bandits</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act2)<br />(equipped ?p Sword)</td>
+            <td>(at GoldCoin Act2)</td>
+        </tr>
+        <tr>
+            <td>pay-goblin</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act2)<br />(available GoldCoin Act2)</td>
+            <td>(known Act3)</td>
+        </tr>
+        <tr>
+            <td>threaten-goblin</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act2)<br />(equipped ?p Torch)</td>
+            <td>(known Act3)</td>
+        </tr>
+        <tr>
+            <td>gift-goblin</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act2)<br />(at House Act2)</td>
+            <td>(known Act3)</td>
+        </tr>
+        <tr>
+            <td>fight-elementals</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(equipped ?p Sword)</td>
+            <td>(at FireSprite Act3)</td>
+        </tr>
+        <tr>
+            <td>sneak-elementals</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(equipped ?p FireSuit)</td>
+            <td>(at FireSprite Act3)</td>
+        </tr>
+        <tr>
+            <td>fight-ritualists</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(equipped ?p Sword)</td>
+            <td>(not (defended Monolith))</td>
+        </tr>
+        <tr>
+            <td>sleep-ritualists</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(equipped ?p SleepBomb)</td>
+            <td>(not (defended Monolith))</td>
+        </tr>
+    </table>
+    <br />
+    Our last category of actions are the actions that don't fit into the other categories.
+    <br />
+    <br />
+    <table>
+        <caption>All remaining actions in the domain.</caption>
+        <tr>
+            <th><strong>Action</strong></th>
+            <th><strong>Arguments</strong></th>
+            <th><strong>Preconditions</strong></th>
+            <th><strong>Effects</strong></th>
+        </tr>
+        <tr>
+            <td>mine</td>
+            <td>?p - Player<br />?m - Mineable<br />?l - Location</td>
+            <td>(at ?p ?l)<br />(at ?m ?l)</td>
+            <td>(available ?m ?l)</td>
+        </tr>
+        <tr>
+            <td>chop</td>
+            <td>?p - Player<br />?c - Choppable<br />?l - Location</td>
+            <td>(at ?p ?l)<br />(at ?c ?l)</td>
+            <td>(available ?c ?l)</td>
+        </tr>
+        <tr>
+            <td>gather</td>
+            <td>?p - Player<br />?g - Gatherable<br />?l - Location</td>
+            <td>(at ?p ?l)<br />(at ?g ?l)</td>
+            <td>(available ?g ?l)</td>
+        </tr>
+        <tr>
+            <td>solve-puzzle</td>
+            <td>?p - Player<br />?z - Puzzle<br />?r - Object<br />?l - Location</td>
+            <td>(at ?p ?l)<br />(at ?z ?l)<br />(reward-for ?z ?r)</td>
+            <td>(at ?r ?l)</td>
+        </tr>
+        <tr>
+            <td>equip</td>
+            <td>?p - Player<br />?e - Equippable<br />?l - Location</td>
+            <td>(at ?p ?l)<br />(available ?e ?l)</td>
+            <td>(equipped ?p ?e)</td>
+        </tr>
+        <tr>
+            <td>destroy-monolith</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(equipped ?p DemoBomb)<br />(not (defended Monolith))</td>
+            <td>(not (active Monolith))</td>
+        </tr>
+        <tr>
+            <td>disable-monolith</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(at DisableButton Act3)<br />(not (defended Monolith))</td>
+            <td>(not (active Monolith))</td>
+        </tr>
+    </table>
   </body>
 </html>
