@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>MPKPref Evaluation Domain</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+  </head>
+  <body>
+    <h1>MPKPref Evaluation Domain</h1>
+    The MPKPref domain has three types, all based on the type Object. All objects of each type are listed below.
+    <br />
+    <br />
+    <ul>
+    <li><b>Player:</b> RedPlayer, BluePlayer, GreenPlayer</li>
+    <li><b>Location:</b> CraggyRocks, AlienSettlement, Forest</li>
+    <li><b>Ship:</b> PlayerShip, CrashedShip</li>
+    <li><b>Object:</b> Cargo, Explosives, AlienTransport, PowerCell</li>
+    </ul>
+    <br />
+    <br />
+    The following is a minimal initial state, where all unlisted literals are false.
+    <br />
+    <br />
+    <table>
+        <caption>The minimal initial state of the domain.</caption>
+        <tr>
+            <th><strong>Proposition</strong></th>
+        </tr>
+        <tr>
+            <td>(on-ship RedPlayer PlayerShip)</td>
+        </tr>
+        <tr>
+            <td>(on-ship BluePlayer PlayerShip)</td>
+        </tr>
+        <tr>
+            <td>(on-ship GreenPlayer PlayerShip)</td>
+        </tr>
+        <tr>
+            <td>(known-location CraggyRocks)</td>
+        </tr>
+        <tr>
+            <td>(known-location AlienSettlement)</td>
+        </tr>
+        <tr>
+            <td>(ship-flying PlayerShip)</td>
+        </tr>
+        <tr>
+            <td>(at-ship CrashedShip Forest)</td>
+        </tr>
+        <tr>
+            <td>(aliens-friendly)</td>
+        </tr>
+        <tr>
+            <td>(at-transport AlienSettlement)</td>
+        </tr>
+        <tr>
+            <td>(flight-ready PlayerShip)</td>
+        </tr>
+        <tr>
+            <td>(open PlayerShip)</td>
+        </tr>
+        <tr>
+            <td>(explosives-on-ship)</td>
+        </tr>
+        <tr>
+            <td>(on-ship Cargo CrashedShip)</td>
+        </tr>
+    </table>
+    <br />
+    The initial knowledge the agents begin with (not including any observations of their initial state) is as follows:
+    <br />
+    <br />
+    <table>
+        <caption>Propositions that the agents know in the initial world state.</caption>
+        <tr>
+            <th><strong>Proposition</strong></th>
+        </tr>
+        <tr>
+            <td>(known-location CraggyRocks)</td>
+        </tr>
+        <tr>
+            <td>(known-location AlienSettlement)</td>
+        </tr>
+        <tr>
+            <td>(ship-flying PlayerShip)</td>
+        </tr>
+        <tr>
+            <td>(flight-ready PlayerShip)</td>
+        </tr>
+        <tr>
+            <td>(on-ship Cargo CrashedShip)</td>
+        </tr>
+        <tr>
+            <td>(open PlayerShip)</td>
+        </tr>
+        <tr>
+            <td>(explosives-on-ship)</td>
+        </tr>
+        <tr>
+            <td>(not (at-ship PlayerShip CraggyRocks))</td>
+        </tr>
+        <tr>
+            <td>(not (at-ship PlayerShip Forest))</td>
+        </tr>
+        <tr>
+            <td>(not (at-ship PlayerShip AlienSettlement))</td>
+        </tr>
+        <tr>
+            <td>(not (at-beacons CraggyRocks))</td>
+        </tr>
+        <tr>
+            <td>(not (at-beacons Forest))</td>
+        </tr>
+        <tr>
+            <td>(not (at-beacons AlienSettlement))</td>
+        </tr>
+        <tr>
+            <td>(not (ship-flying CrashedShip))</td>
+        </tr>
+        <tr>
+            <td>(not (known-location Forest))</td>
+        </tr>
+        <tr>
+            <td>(not (beacons-setup))</td>
+        </tr>
+        <tr>
+            <td>(not (explosives-ready))</td>
+        </tr>
+        <tr>
+            <td>(not (baydoors-open))</td>
+        </tr>
+        <tr>
+            <td>(not (on-transport Cargo))</td>
+        </tr>
+        <tr>
+            <td>(not (on-ship Cargo PlayerShip))</td>
+        </tr>
+        <tr>
+            <td>(not (explosives-on-transport))</td>
+        </tr>
+        <tr>
+            <td>(not (victory))</td>
+        </tr>
+        <tr>
+            <td>(not (transport-available))</td>
+        </tr>
+    </table>
+    <br />
+    <br />
+    <table>
+        <caption>I opted for making the goal state a single proposition called victory which is supplied by the warp-home action, as this is the only action that can successfully end any solution plan to retrieve the cargo.</caption>
+        <tr>
+            <th><strong>Proposition</strong></th>
+        </tr>
+        <tr>
+            <td>(victory)</td>
+        </tr>
+    </table>
+    <br />
+    We separated actions into rough categories to make it easier to browse. These categories do not exist in the planning process.
+    <br />
+    <br />
+    <table>
+        <caption>Movement-related actions in the domain.</caption>
+        <tr>
+            <th><strong>Action</strong></th>
+            <th><strong>Arguments</strong></th>
+            <th><strong>Preconditions</strong></th>
+            <th><strong>Effects</strong></th>
+        </tr>
+        <tr>
+            <td>land-ship</td>
+            <td>?p - Player<br />
+?s - Ship<br />
+?l - Location</td>
+            <td>(on-ship RedPlayer ?s)<br />
+                (on-ship BluePlayer ?s)<br />
+                (on-ship GreenPlayer ?s)<br />
+                (ship-flying ?s)<br />
+                (known-location ?l)</td>
+            <td>(at-ship ?s ?l)<br />
+(not (ship-flying ?s)</td>
+        </tr>
+        <tr>
+            <td>exit-ship</td>
+            <td>?l - Location<br />
+?s - Ship</td>
+            <td>(on-ship RedPlayer ?s)<br />
+                (on-ship BluePlayer ?s)<br />
+                (on-ship GreenPlayer ?s)<br />
+                (at-ship ?s ?l)<br />
+                (not (ship-flying ?s))</td>
+            <td>(at RedPlayer ?l)<br />
+                (at BluePlayer ?l)<br />
+                (at GreenPlayer ?l)<br />
+                (not (on-ship RedPlayer ?s)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(on-ship BluePlayer ?s)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(on-ship GreenPlayer ?s))</td>
+        </tr>
+        <tr>
+            <td>enter-ship</td>
+            <td>?l - Location<br />
+?s - Ship</td>
+            <td>(at RedPlayer ?l)<br />
+                (at BluePlayer ?l)<br />
+                (at GreenPlayer ?l)<br />
+                (at-ship ?s ?l)<br />
+                (open ?s)<br />
+                (not (ship-flying ?s))</td>
+            <td>(on-ship RedPlayer ?s)<br />
+                (on-ship BluePlayer ?s)<br />
+                (on-ship GreenPlayer ?s)<br />
+                (not (at RedPlayer ?l)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(at BluePlayer ?l)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(at GreenPlayer ?l))</td>
+        </tr>
+        <tr>
+            <td>takeoff-ship</td>
+            <td>?p - Player<br />
+?l - Location<br />
+?s - Ship</td>
+            <td>(on-ship ?p ?s)<br />
+                (flight-ready ?s)<br />
+                (at-ship ?s ?l)<br />
+                (not (ship-flying ?s)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(damaged ?s))</td>
+            <td>(ship-flying ?s)<br />
+(not (at-ship ?s ?l))</td>
+        </tr>
+        <tr>
+            <td>enter-alien-transport</td>
+            <td>?l - Location</td>
+            <td>(at RedPlayer ?l)<br />
+                (at BluePlayer ?l)<br />
+                (at GreenPlayer ?l)<br />
+                (at-transport ?l)<br />
+                (transport-available)</td>
+            <td>(on-transport RedPlayer)<br />
+                (on-transport BluePlayer)<br />
+                (on-transport GreenPlayer)<br />
+                (not (at RedPlayer ?l)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(at BluePlayer ?l)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(at GreenPlayer ?l))</td>
+        </tr>
+        <tr>
+            <td>drive-alien-transport</td>
+            <td>?p - Player<br />
+?l1 - Location<br />
+?l2 - Location</td>
+            <td>(on-transport RedPlayer)<br />
+                (on-transport BluePlayer)<br />
+                (on-transport GreenPlayer)<br />
+                (at-transport ?l1)<br />
+                (known-location ?l2)</td>
+            <td>(at-transport ?l2)<br />
+(not (at-transport ?l1))</td>
+        </tr>
+        <tr>
+            <td>exit-alien-transport</td>
+            <td>?l - Location</td>
+            <td>(at-transport ?l)<br />
+                (on-transport RedPlayer)<br />
+                (on-transport BluePlayer)<br />
+                (on-transport GreenPlayer)</td>
+            <td>(at RedPlayer ?l)<br />
+                (at BluePlayer ?l)<br />
+                (at GreenPlayer ?l)<br />
+                (not (on-transport RedPlayer)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(on-transport BluePlayer)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(on-transport GreenPlayer))</td>
+        </tr>
+        <tr>
+            <td>warp-home</td>
+            <td>?s - Ship</td>
+            <td>(on-ship RedPlayer ?s)<br />
+                (on-ship BluePlayer ?s)<br />
+                (on-ship GreenPlayer ?s)<br />
+                (on-ship Cargo ?s)<br />
+                (ship-flying ?s)</td>
+            <td>(victory)</td>
+        </tr>
+    </table>
+    <br />
+    Next, we have four movement-related actions. Each action is designed to move the entire team as a unit; this way, the solution plan is more readable since it contains a quarter as many move actions. First, we have a generic "proceed" action which is used to move from place to place once all players are ready to move. The other three actions are the act-specific actions which cause the players to be ready to move. They are separate actions because they have their own distinct preconditions; for example, in Act 1 the boat simply needs to not be defended for the group to proceed to Act 2, but in Act 3 the Monolith must be deactivated or destroyed before the group can proceed to ComingHome.
+    <br />
+    <br />
+    <table>
+        <caption>Movement-related actions in the domain.</caption>
+        <tr>
+            <th><strong>Action</strong></th>
+            <th><strong>Arguments</strong></th>
+            <th><strong>Preconditions</strong></th>
+            <th><strong>Effects</strong></th>
+        </tr>
+        <tr>
+            <td>proceed</td>
+            <td>?l1 - Location<br />?l2 - Location</td>
+            <td>(connected ?l1 ?l2)<br />(at Red ?l1)<br />(at Blue ?l1)<br />(at Green ?l1)<br />(readyto ?l2)</td>
+            <td>(at Red ?l2)<br />(at Green ?l2)<br />(at Blue ?l2)<br />(not (at Red ?l1)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(at Green ?l1)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(at Blue ?l1)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(readyto ?l2))</td>
+        </tr>
+        <tr>
+            <td>captain-boat</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act1)<br />(not (defended Boat))</td>
+            <td>(readyto Act2)</td>
+        </tr>
+        <tr>
+            <td>disembark</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act2)<br />(known Act3)</td>
+            <td>(readyto Act3)</td>
+        </tr>
+        <tr>
+            <td>exit</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(not (active Monolith))</td>
+            <td>(readyto ComingHome)</td>
+        </tr>
+    </table>
+    <br />
+    We classify the next group of actions as "inhabitant-related" as they relate to at least the rough concept of NPCs who inhabit the domain (though the NPCs aren't actually characters in the planning process). This category is rather arbitrary and simply gives us a way to not have our "all remaining actions" table be massive.
+    <br />
+    <br />
+    <table>
+        <caption>Inhabitant-related actions in the domain.</caption>
+        <tr>
+            <th><strong>Action</strong></th>
+            <th><strong>Arguments</strong></th>
+            <th><strong>Preconditions</strong></th>
+            <th><strong>Effects</strong></th>
+        </tr>
+        <tr>
+            <td>attack-camp</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act1)<br />(equipped ?p Sword)</td>
+            <td>(not (defended Boat))</td>
+        </tr>
+        <tr>
+            <td>sneak-by-camp</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act1)<br />(equipped ?p ChameleonSalve)</td>
+            <td>(not (defended Boat))</td>
+        </tr>
+        <tr>
+            <td>fight-bandits</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act2)<br />(equipped ?p Sword)</td>
+            <td>(at GoldCoin Act2)</td>
+        </tr>
+        <tr>
+            <td>pay-goblin</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act2)<br />(available GoldCoin Act2)</td>
+            <td>(known Act3)</td>
+        </tr>
+        <tr>
+            <td>threaten-goblin</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act2)<br />(equipped ?p Torch)</td>
+            <td>(known Act3)</td>
+        </tr>
+        <tr>
+            <td>gift-goblin</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act2)<br />(at House Act2)</td>
+            <td>(known Act3)</td>
+        </tr>
+        <tr>
+            <td>fight-elementals</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(equipped ?p Sword)</td>
+            <td>(at FireSprite Act3)</td>
+        </tr>
+        <tr>
+            <td>sneak-elementals</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(equipped ?p FireSuit)</td>
+            <td>(at FireSprite Act3)</td>
+        </tr>
+        <tr>
+            <td>fight-ritualists</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(equipped ?p Sword)</td>
+            <td>(not (defended Monolith))</td>
+        </tr>
+        <tr>
+            <td>sleep-ritualists</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(equipped ?p SleepBomb)</td>
+            <td>(not (defended Monolith))</td>
+        </tr>
+    </table>
+    <br />
+    Our last category of actions are the actions that don't fit into the other categories.
+    <br />
+    <br />
+    <table>
+        <caption>All remaining actions in the domain.</caption>
+        <tr>
+            <th><strong>Action</strong></th>
+            <th><strong>Arguments</strong></th>
+            <th><strong>Preconditions</strong></th>
+            <th><strong>Effects</strong></th>
+        </tr>
+        <tr>
+            <td>mine</td>
+            <td>?p - Player<br />?m - Mineable<br />?l - Location</td>
+            <td>(at ?p ?l)<br />(at ?m ?l)</td>
+            <td>(available ?m ?l)</td>
+        </tr>
+        <tr>
+            <td>chop</td>
+            <td>?p - Player<br />?c - Choppable<br />?l - Location</td>
+            <td>(at ?p ?l)<br />(at ?c ?l)</td>
+            <td>(available ?c ?l)</td>
+        </tr>
+        <tr>
+            <td>gather</td>
+            <td>?p - Player<br />?g - Gatherable<br />?l - Location</td>
+            <td>(at ?p ?l)<br />(at ?g ?l)</td>
+            <td>(available ?g ?l)</td>
+        </tr>
+        <tr>
+            <td>solve-puzzle</td>
+            <td>?p - Player<br />?z - Puzzle<br />?r - Object<br />?l - Location</td>
+            <td>(at ?p ?l)<br />(at ?z ?l)<br />(reward-for ?z ?r)</td>
+            <td>(at ?r ?l)</td>
+        </tr>
+        <tr>
+            <td>equip</td>
+            <td>?p - Player<br />?e - Equippable<br />?l - Location</td>
+            <td>(at ?p ?l)<br />(available ?e ?l)</td>
+            <td>(equipped ?p ?e)</td>
+        </tr>
+        <tr>
+            <td>destroy-monolith</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(equipped ?p DemoBomb)<br />(not (defended Monolith))</td>
+            <td>(not (active Monolith))</td>
+        </tr>
+        <tr>
+            <td>disable-monolith</td>
+            <td>?p - Player</td>
+            <td>(at ?p Act3)<br />(at DisableButton Act3)<br />(not (defended Monolith))</td>
+            <td>(not (active Monolith))</td>
+        </tr>
+    </table>
+  </body>
+</html>
