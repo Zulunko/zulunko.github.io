@@ -146,10 +146,11 @@
             <td>(not (transport-available))</td>
         </tr>
     </table>
+    I opted for making the goal state a single proposition called victory which is supplied by the warp-home action, as this is the only action that can successfully end any solution plan to retrieve the cargo.
     <br />
     <br />
     <table>
-        <caption>I opted for making the goal state a single proposition called victory which is supplied by the warp-home action, as this is the only action that can successfully end any solution plan to retrieve the cargo.</caption>
+        <caption>Goal state.</caption>
         <tr>
             <th><strong>Proposition</strong></th>
         </tr>
@@ -282,11 +283,9 @@
         </tr>
     </table>
     <br />
-    Next, we have four movement-related actions. Each action is designed to move the entire team as a unit; this way, the solution plan is more readable since it contains a quarter as many move actions. First, we have a generic "proceed" action which is used to move from place to place once all players are ready to move. The other three actions are the act-specific actions which cause the players to be ready to move. They are separate actions because they have their own distinct preconditions; for example, in Act 1 the boat simply needs to not be defended for the group to proceed to Act 2, but in Act 3 the Monolith must be deactivated or destroyed before the group can proceed to ComingHome.
-    <br />
     <br />
     <table>
-        <caption>Movement-related actions in the domain.</caption>
+        <caption>Setup category actions in the domain.</caption>
         <tr>
             <th><strong>Action</strong></th>
             <th><strong>Arguments</strong></th>
@@ -294,36 +293,67 @@
             <th><strong>Effects</strong></th>
         </tr>
         <tr>
-            <td>proceed</td>
-            <td>?l1 - Location<br />?l2 - Location</td>
-            <td>(connected ?l1 ?l2)<br />(at Red ?l1)<br />(at Blue ?l1)<br />(at Green ?l1)<br />(readyto ?l2)</td>
-            <td>(at Red ?l2)<br />(at Green ?l2)<br />(at Blue ?l2)<br />(not (at Red ?l1)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(at Green ?l1)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(at Blue ?l1)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(readyto ?l2))</td>
+            <td>setup-triangulation-beacons</td>
+            <td>?p - Player<br />
+?l - Location</td>
+            <td>(at-ship PlayerShip ?l)<br />
+                (at ?p ?l)<br />
+                (not (ship-flying PlayerShip))</td>
+            <td>(at-beacons ?l)</td>
         </tr>
         <tr>
-            <td>captain-boat</td>
-            <td>?p - Player</td>
-            <td>(at ?p Act1)<br />(not (defended Boat))</td>
-            <td>(readyto Act2)</td>
+            <td>triangulate-ship</td>
+            <td>?p - Player<br />
+?l - Location</td>
+            <td>(at ?p ?l)<br />
+                (at-beacons ?l)</td>
+            <td>(known-location Forest)</td>
         </tr>
         <tr>
-            <td>disembark</td>
+            <td>ask-aliens-about-ship</td>
             <td>?p - Player</td>
-            <td>(at ?p Act2)<br />(known Act3)</td>
-            <td>(readyto Act3)</td>
+            <td>(at ?p AlienSettlement)<br />
+                (aliens-friendly)</td>
+            <td>(known-location Forest)</td>
         </tr>
         <tr>
-            <td>exit</td>
+            <td>threaten-aliens-for-information</td>
             <td>?p - Player</td>
-            <td>(at ?p Act3)<br />(not (active Monolith))</td>
-            <td>(readyto ComingHome)</td>
+            <td>(at ?p AlienSettlement)</td>
+            <td>(known-location Forest)<br />
+                (not (aliens-friendly))</td>
+        </tr>
+        <tr>
+            <td>rent-alien-transport</td>
+            <td>?p - Player</td>
+            <td>(at ?p AlienSettlement)<br />
+                (aliens-friendly)</td>
+            <td>(transport-available)</td>
+        </tr>
+        <tr>
+            <td>threaten-aliens-for-transport</td>
+            <td>?p - Player</td>
+            <td>(at ?p AlienSettlement)</td>
+            <td>(transport-available)<br />
+                (not (aliens-friendly))</td>
+        </tr>
+        <tr>
+            <td>load-explosives-on-alien-transport</td>
+            <td>?p - Player<br />
+?l - Location</td>
+            <td>(at-ship PlayerShip ?l)<br />
+                (at ?p ?l)<br />
+                (at-transport ?l)<br />
+                (explosives-on-ship)<br />
+                (not (explosives-on-transport))</td>
+            <td>(explosives-on-transport)<br />
+                (not (explosives-on-ship))</td>
         </tr>
     </table>
     <br />
-    We classify the next group of actions as "inhabitant-related" as they relate to at least the rough concept of NPCs who inhabit the domain (though the NPCs aren't actually characters in the planning process). This category is rather arbitrary and simply gives us a way to not have our "all remaining actions" table be massive.
-    <br />
     <br />
     <table>
-        <caption>Inhabitant-related actions in the domain.</caption>
+        <caption>Entry category actions in the domain.</caption>
         <tr>
             <th><strong>Action</strong></th>
             <th><strong>Arguments</strong></th>
@@ -331,72 +361,69 @@
             <th><strong>Effects</strong></th>
         </tr>
         <tr>
-            <td>attack-camp</td>
+            <td>prepare-explosives-from-alien-transport</td>
             <td>?p - Player</td>
-            <td>(at ?p Act1)<br />(equipped ?p Sword)</td>
-            <td>(not (defended Boat))</td>
+            <td>(at ?p Forest)<br />
+                (at-transport Forest)<br />
+                (explosives-on-transport)</td>
+            <td>(explosives-ready)<br />
+                (not (explosives-on-transport))</td>
         </tr>
         <tr>
-            <td>sneak-by-camp</td>
+            <td>prepare-explosives-from-ship</td>
             <td>?p - Player</td>
-            <td>(at ?p Act1)<br />(equipped ?p ChameleonSalve)</td>
-            <td>(not (defended Boat))</td>
+            <td>(at ?p Forest)<br />
+                (at-ship PlayerShip Forest)<br />
+                (explosives-on-ship)</td>
+            <td>(explosives-ready)<br />
+                (not (explosives-on-ship))</td>
         </tr>
         <tr>
-            <td>fight-bandits</td>
+            <td>explode-ship-door</td>
             <td>?p - Player</td>
-            <td>(at ?p Act2)<br />(equipped ?p Sword)</td>
-            <td>(at GoldCoin Act2)</td>
+            <td>(at ?p Forest)<br />
+                (explosives-ready)</td>
+            <td>(open CrashedShip)<br />
+                (damaged CrashedShip)<br />
+                (not (explosives-ready))</td>
         </tr>
         <tr>
-            <td>pay-goblin</td>
+            <td>connect-to-ship</td>
             <td>?p - Player</td>
-            <td>(at ?p Act2)<br />(available GoldCoin Act2)</td>
-            <td>(known Act3)</td>
+            <td>(at ?p Forest)<br />
+                (powered-crashed-ship)</td>
+            <td>(open CrashedShip)</td>
         </tr>
         <tr>
-            <td>threaten-goblin</td>
+            <td>power-ship-with-player-ship</td>
             <td>?p - Player</td>
-            <td>(at ?p Act2)<br />(equipped ?p Torch)</td>
-            <td>(known Act3)</td>
+            <td>(at ?p Forest)<br />
+                (at-ship PlayerShip Forest)<br />
+                (not (powered-crashed-ship))</td>
+            <td>(powered-crashed-ship)<br />
+                (temporary-power)</td>
         </tr>
         <tr>
-            <td>gift-goblin</td>
+            <td>power-ship-with-alien-transport</td>
             <td>?p - Player</td>
-            <td>(at ?p Act2)<br />(at House Act2)</td>
-            <td>(known Act3)</td>
+            <td>(at ?p Forest)<br />
+                (at-transport Forest)<br />
+                (not (powered-crashed-ship))</td>
+            <td>(powered-crashed-ship)<br />
+                (temporary-power)</td>
         </tr>
         <tr>
-            <td>fight-elementals</td>
+            <td>inspect-ship-hull</td>
             <td>?p - Player</td>
-            <td>(at ?p Act3)<br />(equipped ?p Sword)</td>
-            <td>(at FireSprite Act3)</td>
-        </tr>
-        <tr>
-            <td>sneak-elementals</td>
-            <td>?p - Player</td>
-            <td>(at ?p Act3)<br />(equipped ?p FireSuit)</td>
-            <td>(at FireSprite Act3)</td>
-        </tr>
-        <tr>
-            <td>fight-ritualists</td>
-            <td>?p - Player</td>
-            <td>(at ?p Act3)<br />(equipped ?p Sword)</td>
-            <td>(not (defended Monolith))</td>
-        </tr>
-        <tr>
-            <td>sleep-ritualists</td>
-            <td>?p - Player</td>
-            <td>(at ?p Act3)<br />(equipped ?p SleepBomb)</td>
-            <td>(not (defended Monolith))</td>
+            <td>(at ?p Forest)<br />
+                (not (open CrashedShip))</td>
+            <td>(open CrashedShip)</td>
         </tr>
     </table>
     <br />
-    Our last category of actions are the actions that don't fit into the other categories.
-    <br />
     <br />
     <table>
-        <caption>All remaining actions in the domain.</caption>
+        <caption>Cargo category actions in the domain.</caption>
         <tr>
             <th><strong>Action</strong></th>
             <th><strong>Arguments</strong></th>
@@ -404,46 +431,173 @@
             <th><strong>Effects</strong></th>
         </tr>
         <tr>
-            <td>mine</td>
-            <td>?p - Player<br />?m - Mineable<br />?l - Location</td>
-            <td>(at ?p ?l)<br />(at ?m ?l)</td>
-            <td>(available ?m ?l)</td>
-        </tr>
-        <tr>
-            <td>chop</td>
-            <td>?p - Player<br />?c - Choppable<br />?l - Location</td>
-            <td>(at ?p ?l)<br />(at ?c ?l)</td>
-            <td>(available ?c ?l)</td>
-        </tr>
-        <tr>
-            <td>gather</td>
-            <td>?p - Player<br />?g - Gatherable<br />?l - Location</td>
-            <td>(at ?p ?l)<br />(at ?g ?l)</td>
-            <td>(available ?g ?l)</td>
-        </tr>
-        <tr>
-            <td>solve-puzzle</td>
-            <td>?p - Player<br />?z - Puzzle<br />?r - Object<br />?l - Location</td>
-            <td>(at ?p ?l)<br />(at ?z ?l)<br />(reward-for ?z ?r)</td>
-            <td>(at ?r ?l)</td>
-        </tr>
-        <tr>
-            <td>equip</td>
-            <td>?p - Player<br />?e - Equippable<br />?l - Location</td>
-            <td>(at ?p ?l)<br />(available ?e ?l)</td>
-            <td>(equipped ?p ?e)</td>
-        </tr>
-        <tr>
-            <td>destroy-monolith</td>
+            <td>teleport-cargo</td>
             <td>?p - Player</td>
-            <td>(at ?p Act3)<br />(equipped ?p DemoBomb)<br />(not (defended Monolith))</td>
-            <td>(not (active Monolith))</td>
+            <td>(on-ship Cargo CrashedShip)<br />
+                (on-ship ?p CrashedShip)<br />
+                (powered-crashed-ship)<br />
+                (teleporter-working)</td>
+            <td>(on-ship Cargo PlayerShip)<br />
+                (not (on-ship Cargo CrashedShip))</td>
         </tr>
         <tr>
-            <td>disable-monolith</td>
+            <td>open-bay-doors</td>
             <td>?p - Player</td>
-            <td>(at ?p Act3)<br />(at DisableButton Act3)<br />(not (defended Monolith))</td>
-            <td>(not (active Monolith))</td>
+            <td>(on-ship ?p CrashedShip)<br />
+                (powered-crashed-ship)<br />
+                (not (baydoors-open))</td>
+            <td>(baydoors-open)</td>
+        </tr>
+        <tr>
+            <td>tractor-beam-cargo</td>
+            <td>?p - Player</td>
+            <td>(on-ship Cargo CrashedShip)<br />
+                (on-ship ?p PlayerShip)<br />
+                (baydoors-open)<br />
+                (ship-flying PlayerShip)</td>
+            <td>(on-ship Cargo PlayerShip)<br />
+                (not (on-ship Cargo CrashedShip))</td>
+        </tr>
+        <tr>
+            <td>load-cargo-on-alien-transport</td>
+            <td>?p - Player</td>
+            <td>(on-ship Cargo CrashedShip)<br />
+                (on-ship ?p CrashedShip)<br />
+                (baydoors-open)<br />
+                (at-transport Forest)</td>
+            <td>(on-transport Cargo)<br />
+                (not (on-ship Cargo CrashedShip))</td>
+        </tr>
+        <tr>
+            <td>move-cargo-from-transport-to-ship</td>
+            <td>?p - Player<br />
+?l - Location</td>
+            <td>(on-transport Cargo)<br />
+                (at-transport ?l)<br />
+                (at-ship PlayerShip ?l)<br />
+                (at ?p ?l)</td>
+            <td>(on-ship Cargo PlayerShip)<br />
+                (not (on-transport Cargo))</td>
+        </tr>
+    </table>
+    <br />
+    <br />
+        <table>
+        <caption>Entry category actions in the domain.</caption>
+        <tr>
+            <th><strong>Action</strong></th>
+            <th><strong>Arguments</strong></th>
+            <th><strong>Preconditions</strong></th>
+            <th><strong>Effects</strong></th>
+        </tr>
+        <tr>
+            <td>prepare-explosives-from-alien-transport</td>
+            <td>?p - Player</td>
+            <td>(at ?p Forest)<br />
+                (at-transport Forest)<br />
+                (explosives-on-transport)</td>
+            <td>(explosives-ready)<br />
+                (not (explosives-on-transport))</td>
+        </tr>
+        <tr>
+            <td>prepare-explosives-from-ship</td>
+            <td>?p - Player</td>
+            <td>(at ?p Forest)<br />
+                (at-ship PlayerShip Forest)<br />
+                (explosives-on-ship)</td>
+            <td>(explosives-ready)<br />
+                (not (explosives-on-ship))</td>
+        </tr>
+        <tr>
+            <td>explode-ship-door</td>
+            <td>?p - Player</td>
+            <td>(at ?p Forest)<br />
+                (explosives-ready)</td>
+            <td>(open CrashedShip)<br />
+                (damaged CrashedShip)<br />
+                (not (explosives-ready))</td>
+        </tr>
+        <tr>
+            <td>connect-to-ship</td>
+            <td>?p - Player</td>
+            <td>(at ?p Forest)<br />
+                (powered-crashed-ship)</td>
+            <td>(open CrashedShip)</td>
+        </tr>
+        <tr>
+            <td>power-ship-with-player-ship</td>
+            <td>?p - Player</td>
+            <td>(at ?p Forest)<br />
+                (at-ship PlayerShip Forest)<br />
+                (not (powered-crashed-ship))</td>
+            <td>(powered-crashed-ship)<br />
+                (temporary-power)</td>
+        </tr>
+        <tr>
+            <td>power-ship-with-alien-transport</td>
+            <td>?p - Player</td>
+            <td>(at ?p Forest)<br />
+                (at-transport Forest)<br />
+                (not (powered-crashed-ship))</td>
+            <td>(powered-crashed-ship)<br />
+                (temporary-power)</td>
+        </tr>
+        <tr>
+            <td>inspect-ship-hull</td>
+            <td>?p - Player</td>
+            <td>(at ?p Forest)<br />
+                (not (open CrashedShip))</td>
+            <td>(open CrashedShip)</td>
+        </tr>
+    </table>
+    <br />
+    <br />
+    <table>
+        <caption>Repair category actions in the domain.</caption>
+        <tr>
+            <th><strong>Action</strong></th>
+            <th><strong>Arguments</strong></th>
+            <th><strong>Preconditions</strong></th>
+            <th><strong>Effects</strong></th>
+        </tr>
+        <tr>
+            <td>replace-power-cell</td>
+            <td>?p - Player</td>
+            <td>(on-ship ?p CrashedShip)<br />
+                (not (crashed-ship-reactor-stable))</td>
+            <td>(crashed-ship-reactor-stable)</td>
+        </tr>
+        <tr>
+            <td>turn-on-ship</td>
+            <td>?p - Player</td>
+            <td>(on-ship ?p CrashedShip)<br />
+                (crashed-ship-reactor-stable)</td>
+            <td>(powered-crashed-ship)<br />
+                (not (temporary-power))</td>
+        </tr>
+        <tr>
+            <td>repair-ship-teleporter</td>
+            <td>?p - Player</td>
+            <td>(on-ship ?p CrashedShip)<br />
+                (powered-crashed-ship)<br />
+                (not (teleporter-working))</td>
+            <td>(teleporter-working)</td>
+        </tr>
+        <tr>
+            <td>repair-engine</td>
+            <td>?p - Player</td>
+            <td>(on-ship ?p CrashedShip)<br />
+                (not (engine-working))</td>
+            <td>(engine-working)</td>
+        </tr>
+        <tr>
+            <td>start-engine</td>
+            <td>?p - Player</td>
+            <td>(on-ship ?p CrashedShip)<br />
+                (engine-working)<br />
+                (powered-crashed-ship)<br />
+                (not (temporary-power))</td>
+            <td>(flight-ready CrashedShip)</td>
         </tr>
     </table>
   </body>
