@@ -10,15 +10,12 @@
     <h1>MPKPref Evaluation Domain</h1>
     The MPKPref domain has three types, all based on the type Object. All objects of each type are listed below.
     <br />
-    <br />
     <ul>
     <li><b>Player:</b> RedPlayer, BluePlayer, GreenPlayer</li>
     <li><b>Location:</b> CraggyRocks, AlienSettlement, Forest</li>
     <li><b>Ship:</b> PlayerShip, CrashedShip</li>
     <li><b>Object:</b> Cargo, Explosives, AlienTransport, PowerCell</li>
     </ul>
-    <br />
-    <br />
     The following is a minimal initial state, where all unlisted literals are false.
     <br />
     <br />
@@ -146,6 +143,7 @@
             <td>(not (transport-available))</td>
         </tr>
     </table>
+    <br />
     I opted for making the goal state a single proposition called victory which is supplied by the warp-home action, as this is the only action that can successfully end any solution plan to retrieve the cargo.
     <br />
     <br />
