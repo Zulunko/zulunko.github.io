@@ -20,7 +20,7 @@
     <br />
     <br />
     <table>
-        <caption>The minimal initial state of the domain.</caption>
+        <caption>The initial state of the domain.</caption>
         <tr>
             <th><strong>Proposition</strong></th>
         </tr>
@@ -157,7 +157,7 @@
         </tr>
     </table>
     <br />
-    We separated actions into rough categories to make it easier to browse. These categories do not exist in the planning process.
+    I separated actions into rough categories to make it easier to browse. These category distinctions do not exist in the planning process.
     <br />
     <br />
     <table>
@@ -476,76 +476,6 @@
                 (at ?p ?l)</td>
             <td>(on-ship Cargo PlayerShip)<br />
                 (not (on-transport Cargo))</td>
-        </tr>
-    </table>
-    <br />
-    <br />
-        <table>
-        <caption>Entry category actions in the domain.</caption>
-        <tr>
-            <th><strong>Action</strong></th>
-            <th><strong>Arguments</strong></th>
-            <th><strong>Preconditions</strong></th>
-            <th><strong>Effects</strong></th>
-        </tr>
-        <tr>
-            <td>prepare-explosives-from-alien-transport</td>
-            <td>?p - Player</td>
-            <td>(at ?p Forest)<br />
-                (at-transport Forest)<br />
-                (explosives-on-transport)</td>
-            <td>(explosives-ready)<br />
-                (not (explosives-on-transport))</td>
-        </tr>
-        <tr>
-            <td>prepare-explosives-from-ship</td>
-            <td>?p - Player</td>
-            <td>(at ?p Forest)<br />
-                (at-ship PlayerShip Forest)<br />
-                (explosives-on-ship)</td>
-            <td>(explosives-ready)<br />
-                (not (explosives-on-ship))</td>
-        </tr>
-        <tr>
-            <td>explode-ship-door</td>
-            <td>?p - Player</td>
-            <td>(at ?p Forest)<br />
-                (explosives-ready)</td>
-            <td>(open CrashedShip)<br />
-                (damaged CrashedShip)<br />
-                (not (explosives-ready))</td>
-        </tr>
-        <tr>
-            <td>connect-to-ship</td>
-            <td>?p - Player</td>
-            <td>(at ?p Forest)<br />
-                (powered-crashed-ship)</td>
-            <td>(open CrashedShip)</td>
-        </tr>
-        <tr>
-            <td>power-ship-with-player-ship</td>
-            <td>?p - Player</td>
-            <td>(at ?p Forest)<br />
-                (at-ship PlayerShip Forest)<br />
-                (not (powered-crashed-ship))</td>
-            <td>(powered-crashed-ship)<br />
-                (temporary-power)</td>
-        </tr>
-        <tr>
-            <td>power-ship-with-alien-transport</td>
-            <td>?p - Player</td>
-            <td>(at ?p Forest)<br />
-                (at-transport Forest)<br />
-                (not (powered-crashed-ship))</td>
-            <td>(powered-crashed-ship)<br />
-                (temporary-power)</td>
-        </tr>
-        <tr>
-            <td>inspect-ship-hull</td>
-            <td>?p - Player</td>
-            <td>(at ?p Forest)<br />
-                (not (open CrashedShip))</td>
-            <td>(open CrashedShip)</td>
         </tr>
     </table>
     <br />
